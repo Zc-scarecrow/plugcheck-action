@@ -1,0 +1,31 @@
+name: "plugcheck"
+description: "Validate Agent Plugins 1.0 packages with plugcheck"
+branding:
+  icon: "check-circle"
+  color: "purple"
+inputs:
+  path:
+    description: "Path to the plugin directory to validate"
+    required: false
+    default: "."
+  version:
+    description: "plugcheck version to use (a GitHub release tag)"
+    required: false
+    default: "v0.1.0"
+  format:
+    description: "Output format: human or json"
+    required: false
+    default: "human"
+  args:
+    description: "Extra command-line arguments passed to plugcheck"
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - name: Install plugcheck
+      shell: bash
+      run: "${{ github.action_path }}/scripts/install.sh" "${{ inputs.version }}"
+    - name: Validate plugin
+      shell: bash
+      run: plugcheck check "${{ inputs.path }}" --format "${{ inputs.format }}" ${{ inputs.args }}

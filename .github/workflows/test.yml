@@ -1,0 +1,55 @@
+name: Test action
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  positive:
+    name: Valid plugin passes (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create a valid sample plugin
+        shell: bash
+        run: |
+          mkdir -p demo
+          cat > demo/plugin.json <<'EOF'
+          {
+            "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+            "name": "demo-plugin"
+          }
+          EOF
+      - name: Run plugcheck action
+        uses: ./
+        with:
+          path: demo
+
+  negative:
+    name: Invalid plugin fails
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create an invalid plugin
+        shell: bash
+        run: |
+          mkdir -p bad
+          echo '{}' > bad/plugin.json
+      - name: Run plugcheck action (expected to fail)
+        id: check
+        continue-on-error: true
+        uses: ./
+        with:
+          path: bad
+      - name: Verify the action failed
+        shell: bash
+        run: |
+          if [ "${{ steps.check.outcome }}" != "failure" ]; then
+            echo "::error::expected plugcheck to reject the invalid plugin"
+            exit 1
+          fi
+          echo "negative test passed"

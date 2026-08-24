@@ -36,7 +36,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sanity-check the installer
         shell: bash
-        run: "${{ github.workspace }}/scripts/install.sh" v0.1.0
+        run: |
+          "${{ github.workspace }}/scripts/install.sh" v0.1.0
       - name: Create an invalid plugin
         shell: bash
         run: |

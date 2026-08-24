@@ -25,7 +25,8 @@ runs:
   steps:
     - name: Install plugcheck
       shell: bash
-      run: "${{ github.action_path }}/scripts/install.sh" "${{ inputs.version }}"
+      run: |
+        "${{ github.action_path }}/scripts/install.sh" "${{ inputs.version }}"
     - name: Validate plugin
       shell: bash
       run: |
